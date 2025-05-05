@@ -1,42 +1,38 @@
 import { Request, Response, NextFunction } from "express";
-import { Express } from "express";
 import bcrypt from 'bcrypt'
 import prisma from "../../config/database";
-import { LoginCredentials, RegisterData, UserPayload } from "../../types";
+import { LoginCredentials, RegisterData, UserPayload } from 'src/types'
 import jwt from "jsonwebtoken";
 
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { username, email, password }: RegisterData = req.body
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = prisma.user.create({
-            data: {
-                username,
-                email,
-                password: hashedPassword
-            }
-        });
+  try {
+    const { username, email, password }: RegisterData = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-        const token = jwt.sign({ id: (await user).id }, process.env.JWT_SECRET as string, { expiresIn: '7d' });
-
-
-        const userPayLoad: UserPayload = {
-            id: (await user).id,
-            username: (await user).username,
-            email: (await user).email,
-        }
+    const user = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+      },
+    });
 
 
-        res.status(201).json({
-            user: userPayLoad,
-            token
-        });
+    const userPayload: UserPayload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
 
-    } catch (error) {
-        next(error);
-    }
+    return res.status(201).json({
+      user: userPayload,
+    });
+  } catch (error) {
+    return next(error);
+  }
 };
+
 
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
@@ -57,7 +53,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET as string, { expiresIn: '1d' });
+
+        res.cookie('token',token,{
+          httpOnly:true
+        })
 
         const userPayload: UserPayload = {
             id: user.id,
@@ -65,11 +65,27 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             email: user.email
         };
 
-        res.json({
+        return res.json({
             user: userPayload,
-            token
         });
     } catch (error) {
-        next(error);
+        return next(error);
     }
+};
+
+export const signout = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Clear the token cookie
+    res.clearCookie('token');
+
+    console.log(`User ${userId} signed out`);
+    return res.status(200).json({ message: 'Successfully signed out' });
+  } catch (error) {
+    return next(error);
+  }
 };

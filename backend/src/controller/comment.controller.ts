@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../../config/database';
-import { CommentData } from '../../types';
+import { CommentData } from 'src/types';
 export const getCommentsByImageId = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { imageId } = req.params;
@@ -20,9 +20,9 @@ export const getCommentsByImageId = async (req: Request, res: Response, next: Ne
       }
     });
     
-    res.json(comments);
+    return res.json(comments);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -30,7 +30,7 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
   try {
     const { imageId } = req.params;
     const { content }: CommentData = req.body;
-    const authorId = req.body.authorId;
+    const authorId = req.userId;
     
     if (!authorId) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -61,9 +61,9 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
       }
     });
     
-    res.status(201).json(comment);
+    return res.status(201).json(comment);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -93,8 +93,8 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
       where: { id }
     });
     
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

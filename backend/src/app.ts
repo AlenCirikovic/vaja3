@@ -1,17 +1,17 @@
-import express, { Express, Request, Response , Application } from 'express';
-import { PrismaClient } from '../generated/prisma';
+import express from 'express';
 import cors from 'cors'
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.route';
 import imageRoutes from './routes/image.route';
 import commentRoutes from './routes/comment.route';
 import voteRoutes from './routes/vote.route';
-import errorHandler from '../middleware/errorHandler';
-
+import errorHandler from '../middleware/errorHandler'
+import cookieParser from 'cookie-parser';
 const app = express()
 
-app.use(cors())
+app.use(cors({credentials:true}))
 app.use(express.json())
+app.use(cookieParser())
 
 const PORT: number = 3000
 

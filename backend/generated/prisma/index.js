@@ -159,7 +159,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "X:\\Users\\Administrator\\Documents\\vaja3\\backend\\generated\\prisma",
+      "value": "C:\\Users\\gamin\\Documents\\vaja3\\backend\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -173,7 +173,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "X:\\Users\\Administrator\\Documents\\vaja3\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\gamin\\Documents\\vaja3\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

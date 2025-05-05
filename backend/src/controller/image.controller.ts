@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../../config/database';
-import { ImageData,ImageUpdateData } from '../../types';
+import { ImageData,ImageUpdateData } from 'src/types';
 
-export const getAllImages = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllImages = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const images = await prisma.image.findMany({
       include: {
@@ -72,14 +72,14 @@ export const getImageById = async (req: Request, res: Response, next: NextFuncti
       score
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 export const createImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, message, imageUrl }: ImageData = req.body;
-    const authorId = req.body.authorId;
+    const authorId = req.userId;
     
     if (!authorId) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -94,9 +94,9 @@ export const createImage = async (req: Request, res: Response, next: NextFunctio
       }
     });
     
-    res.status(201).json(image);
+    return res.status(201).json(image);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -104,7 +104,7 @@ export const updateImage = async (req: Request, res: Response, next: NextFunctio
   try {
     const { id } = req.params;
     const { title, message }: ImageUpdateData = req.body;
-    const userId = req.body.userId;
+    const userId = req.userId;
     
     if (!userId) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -132,16 +132,16 @@ export const updateImage = async (req: Request, res: Response, next: NextFunctio
       }
     });
     
-    res.json(updatedImage);
+    return res.json(updatedImage);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 export const deleteImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const userId = req.body.userId;
+    const userId = req.userId;
     
     if (!userId) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -167,8 +167,8 @@ export const deleteImage = async (req: Request, res: Response, next: NextFunctio
       prisma.image.delete({ where: { id } })
     ]);
     
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };

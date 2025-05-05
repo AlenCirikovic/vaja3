@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '../generated/prisma';
 
-const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   
   // Handle Prisma errors
@@ -12,7 +12,7 @@ const errorHandler = (err: Error, req: Request, res: Response, next: NextFunctio
     return res.status(400).json({ error: 'Database error', details: err.message });
   }
   
-  res.status(500).json({ error: 'Something went wrong on our end' });
+  return res.status(500).json({ error: 'Something went wrong on our end' });
 };
 
 export default errorHandler;

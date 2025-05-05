@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../../config/database';
-import { VoteData } from '../../types';
+import { VoteData } from 'src/types';
 
 export const voteImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { imageId } = req.params;
     const { voteType }: VoteData = req.body; // 1 for like, -1 for dislike
-    const userId = req.body.userId;
+    const userId = req.userId;
     
     if (!userId) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -62,17 +62,17 @@ export const voteImage = async (req: Request, res: Response, next: NextFunction)
           imageId
         }
       });
-      res.status(201).json(newVote);
+      return res.status(201).json(newVote);
     }
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
 export const getVoteStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { imageId } = req.params;
-    const userId = req.body.userId;
+    const userId = req.userId;
     
     if (!userId) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -87,8 +87,8 @@ export const getVoteStatus = async (req: Request, res: Response, next: NextFunct
       }
     });
     
-    res.json({ voteStatus: vote ? vote.voteType : 0 });
+    return res.json({ voteStatus: vote ? vote.voteType : 0 });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
