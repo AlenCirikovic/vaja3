@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import prisma from '../../config/database';
 import { ImageData,ImageUpdateData } from 'src/types';
 
+
+
+
 export const getAllImages = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const images = await prisma.image.findMany({
@@ -78,21 +81,26 @@ export const getImageById = async (req: Request, res: Response, next: NextFuncti
 
 export const createImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, message, imageUrl }: ImageData = req.body;
+    const { title, message }: ImageData = req.body;
     const authorId = req.userId;
     
     if (!authorId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
     
+    if (!req.file) {
+      return res.status(400).json({ error: 'Image file is required.' });
+    }
+    
     const image = await prisma.image.create({
       data: {
         title,
         message,
-        imageUrl,
+        imageUrl: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`,
         authorId
       }
     });
+    
     
     return res.status(201).json(image);
   } catch (error) {

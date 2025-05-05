@@ -5,6 +5,34 @@ import { LoginCredentials, RegisterData, UserPayload } from 'src/types'
 import jwt from "jsonwebtoken";
 
 
+export const status = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, username: true, email: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userPayload: UserPayload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
+
+    return res.json({ user: userPayload });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, email, password }: RegisterData = req.body;

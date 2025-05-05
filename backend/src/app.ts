@@ -7,11 +7,13 @@ import commentRoutes from './routes/comment.route';
 import voteRoutes from './routes/vote.route';
 import errorHandler from '../middleware/errorHandler'
 import cookieParser from 'cookie-parser';
+import path from 'path';
 const app = express()
 
-app.use(cors({credentials:true}))
+app.use(cors({credentials:true, origin:"http://localhost:5173"}))
 app.use(express.json())
 app.use(cookieParser())
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
 const PORT: number = 3000
 
