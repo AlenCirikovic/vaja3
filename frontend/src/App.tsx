@@ -1,69 +1,70 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import axios from 'axios'
+import { useState, useEffect } from 'react';
+   import { Routes, Route, Navigate } from 'react-router-dom';
+   import Navbar from './components/Navbar';
+   import Home from './pages/Home';
+   import Login from './pages/Login';
+   import Register from './pages/Register';
+   import ImageDetail from './pages/ImageDetail';
+   import UploadImage from './pages/UploadImage';
+   import { UserPayload } from './types';
 
-function App() {
-  const [count, setCount] = useState(0)
-  const [images, setImages] = useState<any[]>([])
+   function App() {
+     const [user, setUser] = useState<UserPayload | null>(null);
+     const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-    fetchImages()
-  }, [])
+     useEffect(() => {
+       const checkAuthStatus = async () => {
+         try {
+           const response = await fetch('http://localhost:3000/api/auth/status', {
+             method: 'GET',
+             credentials: 'include',
+           });
+           if (response.ok) {
+             const data = await response.json();
+             setUser(data.user);
+           }
+         } catch (error) {
+           // Silent
+         } finally {
+           setLoading(false);
+         }
+       };
+       checkAuthStatus();
+     }, []);
 
-  const fetchImages = async () =>{
-    const res = await axios.get("http://localhost:3000/api/images");
-    setImages(res.data)
-    //console.log(res.data)
-  }
+     const handleLogout = async () => {
+       try {
+         await fetch('http://localhost:3000/api/auth/signout', {
+           method: 'POST',
+           credentials: 'include',
+         });
+         setUser(null);
+       } catch (error) {
+         // Silent
+       }
+     };
 
+     if (loading) {
+       return <div className="text-center mt-10">Loading...</div>;
+     }
 
-  
+     return (
+       <div className="min-h-screen bg-gray-100">
+         <Navbar user={user} onLogout={handleLogout} />
+         <main className="container mx-auto p-4">
+           <Routes>
+             <Route path="/" element={<Home />} />
+             <Route path="/login" element={user ? <Navigate to="/" /> : <Login setUser={setUser} />} />
+             <Route path="/register" element={user ? <Navigate to="/" /> : <Register setUser={setUser} />} />
+             <Route path="/images/:id" element={<ImageDetail user={user} />} />
+             <Route
+               path="/upload"
+               element={user ? <UploadImage user={user} /> : <Navigate to="/login" />}
+             />
+           </Routes>
+         </main>
+       </div>
+     );
+   }
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-        {images.map((image, index) => (
-          <div key={image.id}>
-            <p>{image.title}</p>
-            <p>{image.message}</p>
-            <img
-              src={image.imageUrl}
-              alt={image.title}
-              style={{ maxWidth: '100%', height: 'auto' }}
-            />
-            <p>
-              By {image.author.username} on{' '}
-              {new Date(image.createdAt).toLocaleDateString()}
-            </p>
-            <p>
-              Comments: {image._count.comments}, Votes: {image._count.votes}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
-
-export default App
+   export default App;
