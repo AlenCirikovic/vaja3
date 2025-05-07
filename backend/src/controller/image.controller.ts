@@ -118,7 +118,6 @@ export const updateImage = async (req: Request, res: Response, next: NextFunctio
       return res.status(401).json({ error: 'Authentication required' });
     }
     
-    // Check if image exists and user is the author
     const existingImage = await prisma.image.findUnique({
       where: { id }
     });
@@ -131,7 +130,6 @@ export const updateImage = async (req: Request, res: Response, next: NextFunctio
       return res.status(403).json({ error: 'Not authorized to update this image' });
     }
     
-    // Update image
     const updatedImage = await prisma.image.update({
       where: { id },
       data: {
@@ -155,7 +153,6 @@ export const deleteImage = async (req: Request, res: Response, next: NextFunctio
       return res.status(401).json({ error: 'Authentication required' });
     }
     
-    // Check if image exists and user is the author
     const existingImage = await prisma.image.findUnique({
       where: { id }
     });
@@ -168,7 +165,6 @@ export const deleteImage = async (req: Request, res: Response, next: NextFunctio
       return res.status(403).json({ error: 'Not authorized to delete this image' });
     }
     
-    // Delete related comments and votes first (if cascade delete is not configured)
     await prisma.$transaction([
       prisma.comment.deleteMany({ where: { imageId: id } }),
       prisma.vote.deleteMany({ where: { imageId: id } }),

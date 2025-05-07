@@ -5,14 +5,13 @@ import { VoteData } from 'src/types';
 export const voteImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { imageId } = req.params;
-    const { voteType }: VoteData = req.body; // 1 for like, -1 for dislike
+    const { voteType }: VoteData = req.body; 
     const userId = req.userId;
     
     if (!userId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
     
-    // Check if image exists
     const image = await prisma.image.findUnique({
       where: { id: imageId }
     });
@@ -21,7 +20,6 @@ export const voteImage = async (req: Request, res: Response, next: NextFunction)
       return res.status(404).json({ error: 'Image not found' });
     }
     
-    // Check if user has already voted on this image
     const existingVote = await prisma.vote.findUnique({
       where: {
         userId_imageId: {
@@ -32,9 +30,7 @@ export const voteImage = async (req: Request, res: Response, next: NextFunction)
     });
     
     if (existingVote) {
-      // Update existing vote
       if (existingVote.voteType === voteType) {
-        // If voting the same way, remove the vote
         await prisma.vote.delete({
           where: {
             id: existingVote.id
@@ -42,7 +38,6 @@ export const voteImage = async (req: Request, res: Response, next: NextFunction)
         });
         res.json({ message: 'Vote removed' });
       } else {
-        // Change vote
         const updatedVote = await prisma.vote.update({
           where: {
             id: existingVote.id
@@ -54,7 +49,6 @@ export const voteImage = async (req: Request, res: Response, next: NextFunction)
         res.json(updatedVote);
       }
     } else {
-      // Create new vote
       const newVote = await prisma.vote.create({
         data: {
           voteType,

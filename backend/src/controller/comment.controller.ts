@@ -36,7 +36,6 @@ export const createComment = async (req: Request, res: Response, next: NextFunct
       return res.status(401).json({ error: 'Authentication required' });
     }
     
-    // Check if image exists
     const image = await prisma.image.findUnique({
       where: { id: imageId }
     });
@@ -76,7 +75,6 @@ export const deleteComment = async (req: Request, res: Response, next: NextFunct
       return res.status(401).json({ error: 'Authentication required' });
     }
     
-    // Check if comment exists and user is the author
     const comment = await prisma.comment.findUnique({
       where: { id }
     });

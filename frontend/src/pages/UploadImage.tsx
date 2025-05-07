@@ -24,13 +24,13 @@ const UploadImage: React.FC<UploadImageProps> = () => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('message', message);
-    formData.append('image', imageFile); // This is the actual file
+    formData.append('image', imageFile); 
 
     try {
       const response = await fetch('http://localhost:3000/api/images', {
         method: 'POST',
         credentials: 'include',
-        body: formData, // Do NOT set Content-Type here — browser handles it
+        body: formData, 
       });
 
       const result = await response.json();

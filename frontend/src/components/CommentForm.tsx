@@ -31,7 +31,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ imageId, onCommentAdded }) =>
       const data: Comment = await response.json();
 
       if (!response.ok) {
-        //throw new Error(data.error || 'Failed to post comment');
+   
       }
 
       setContent('');

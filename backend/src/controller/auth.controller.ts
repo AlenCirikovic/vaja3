@@ -108,7 +108,6 @@ export const signout = async (req: Request, res: Response, next: NextFunction) =
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Clear the token cookie
     res.clearCookie('token');
 
     console.log(`User ${userId} signed out`);

@@ -4,7 +4,6 @@ import { Prisma } from '../generated/prisma';
 const errorHandler = (err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);
   
-  // Handle Prisma errors
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
       return res.status(409).json({ error: 'Unique constraint violation' });

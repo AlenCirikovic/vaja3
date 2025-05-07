@@ -31,5 +31,5 @@ export interface UserPayload {
   }
   
   export interface VoteData {
-    voteType: number; // 1 for like, -1 for dislike
+    voteType: number; 
   }
